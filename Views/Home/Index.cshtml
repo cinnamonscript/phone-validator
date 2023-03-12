@@ -1,0 +1,115 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Phone Number Validator</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#validate-button').click(function(event) {
+                event.preventDefault();
+
+                // Get the phone number and country code from the input fields
+                var phoneNumber = $('#phone-number-input').val();
+                var countryCode = $('#country-code-input').val();
+
+                // Make a POST request to the validation API
+                $.ajax({
+                    url: '/api/values',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        number: phoneNumber,
+                        countryCode: countryCode
+                    }),
+                    success: function(data) {
+                        // Display the validation results
+                        $('#is-valid-result').text(data.isValid);
+                        $('#is-possible-result').text(data.isPossible);
+                        $('#phone-type-result').text(data.phoneType);
+                        $('#international-format-result').text(data.internationalFormat);
+
+                        // Add a link to download the CSV file
+                        var downloadLink = $('<a/>', {
+                            href: data.csvUrl,
+                            download: 'phone_details.csv',
+                            text: 'Download as CSV'
+                        });
+                        $('#csv-download-link').html(downloadLink);
+                    },
+                    error: function(xhr, status, error) {
+                        // Display an error message
+                        $('#validation-error-message').text('Error: ' + xhr.responseText);
+                    }
+                    
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+
+
+    <div class="jumbotron">
+        <h1>ASP.NET</h1>
+        <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
+        <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <h2>Getting started</h2>
+            <p>
+                ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
+                a broad range of clients, including browsers and mobile devices. ASP.NET Web API
+                is an ideal platform for building RESTful applications on the .NET Framework.
+            </p>
+            <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
+        </div>
+        <div class="col-md-4">
+            <h2>Get more libraries</h2>
+            <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
+            <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
+        </div>
+        <div class="col-md-4">
+            <h2>Web Hosting</h2>
+            <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
+            <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
+        </div>
+    </div>
+
+
+    <h1>Phone Number Validator</h1>
+    <form>
+        <div>
+            <label for="phone-number-input">Phone Number:</label>
+            <input type="text" id="phone-number-input" name="phoneNumber">
+        </div>
+        <div>
+            <label for="country-code-input">Country Code:</label>
+            <input type="text" id="country-code-input" name="countryCode">
+        </div>
+        <div>
+            <button id="validate-button" type="submit">Validate</button>
+        </div>
+    </form>
+    <h2>Validation Results</h2>
+    <div>
+        <label for="is-valid-result">Is Valid:</label>
+        <span id="is-valid-result"></span>
+    </div>
+    <div>
+        <label for="is-possible-result">Is Possible:</label>
+        <span id="is-possible-result"></span>
+    </div>
+    <div>
+        <label for="phone-type-result">Phone Type:</label>
+        <span id="phone-type-result"></span>
+    </div>
+    <div>
+        <label for="international-format-result">International Format:</label>
+        <span id="international-format-result"></span>
+    </div>
+    <div id="csv-download-link"></div>
+    <div id="validation-error-message"></div>
+</body>
+</html>
