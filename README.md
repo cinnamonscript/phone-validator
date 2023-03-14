@@ -26,5 +26,5 @@ To install the PhoneNumbers and Newtonsoft.Json libraries, you can use NuGet Pac
 `Install-Package Newtonsoft.Json`
 
 # Prerequisites
-*.NET and ASP.NET environment
-*Nuget package manager
+* .NET and ASP.NET environment
+* Nuget package manager
