@@ -10,16 +10,13 @@ using PhoneNumbers;
 using PhoneValidatorAPI.Models;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
+using System.Web;
 
 namespace PhoneValidatorAPI.Controllers
 {
     public class ValuesController : ApiController
     {
         // GET api/values
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
 
         private readonly List<Country> _supportedCountries;
         public ValuesController()
@@ -40,6 +37,32 @@ namespace PhoneValidatorAPI.Controllers
             return _supportedCountries;
         }
 
+        // GET 
+        [HttpGet]
+        public IHttpActionResult DownloadCsv(string downloadId)
+        {
+            var filePath = HttpContext.Current.Server.MapPath("~/App_Data/" + downloadId + ".csv");
+
+            if (!File.Exists(filePath))
+            {
+                return NotFound();
+            }
+
+            var fileBytes = File.ReadAllBytes(filePath);
+
+            var result = new HttpResponseMessage(HttpStatusCode.OK);
+            var content = new ByteArrayContent(fileBytes);
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = $"phone_details_{downloadId}.csv"
+            };
+            result.Content = content;
+
+            return ResponseMessage(result);
+        }
+
+
         // POST api/values
         private static string CreateCsvFileContent(PhoneNumberDetails phoneNumberDetails)
         {
@@ -49,75 +72,76 @@ namespace PhoneValidatorAPI.Controllers
             return csv.ToString();
         }
 
+        private static string GetFormattedPhoneType(string phoneType)
+        {
+            string[] words = phoneType.Split('_');
+            for (int i = 0; i < words.Length; i++)
+            {
+                words[i] = words[i][0] + words[i].Substring(1).ToLower();
+            }
+            return string.Join(" ", words);
+        }
+
         // POST api/values
-        public HttpResponseMessage ValidatePhoneNumber([FromBody] PhoneNumberDigits phoneNumber)
+        public IHttpActionResult ValidatePhoneNumber([FromBody] PhoneNumberDigits phoneNumber)
         {
             try
             {
                 var parsedPhoneNumber = phoneNumberUtil.Parse(phoneNumber.Number, phoneNumber.CountryCode);
 
-                if (!phoneNumberUtil.IsValidNumber(parsedPhoneNumber))
-                {
-                    var responseMessage = new HttpResponseMessage(HttpStatusCode.BadRequest);
-                    responseMessage.Content = new StringContent("Invalid phone number.");
-                    return responseMessage;
-                }
-
-                else if (parsedPhoneNumber == null)
-                {
-                    var responseMessage = new HttpResponseMessage(HttpStatusCode.BadRequest);
-                    responseMessage.Content = new StringContent("Phone number and country code are required.");
-                    return responseMessage; 
-                }
-
                 var phoneNumberDetails = new PhoneNumberDetails
                 {
                     IsValid = phoneNumberUtil.IsValidNumber(parsedPhoneNumber),
                     IsPossible = phoneNumberUtil.IsPossibleNumber(parsedPhoneNumber),
-                    PhoneType = phoneNumberUtil.GetNumberType(parsedPhoneNumber).ToString(),
+                    PhoneType = GetFormattedPhoneType(phoneNumberUtil.GetNumberType(parsedPhoneNumber).ToString()),
                     InternationalFormat = phoneNumberUtil.Format(parsedPhoneNumber, PhoneNumberFormat.INTERNATIONAL)
                 };
 
-                // Create a CSV file with phone number details
+                if (!phoneNumberUtil.IsValidNumber(parsedPhoneNumber))
+                {
+                    return BadRequest("Invalid phone number.");
+                }
+
+                else if (parsedPhoneNumber == null)
+                {
+                    return BadRequest("Phone number and country code are required.");
+                }
+
                 var csvContent = CreateCsvFileContent(phoneNumberDetails);
 
-                // Create a new response message with the CSV content
-                var response = new HttpResponseMessage(HttpStatusCode.OK)
+                // Generate a unique download ID
+                var downloadId = Guid.NewGuid().ToString();
+
+                // Save the CSV content to a file
+                var filePath = HttpContext.Current.Server.MapPath("~/App_Data/" + downloadId + ".csv");
+                File.WriteAllText(filePath, csvContent);
+
+                // Generate the download URL
+                var downloadUrl = "/api/downloadcsv/" + downloadId;
+
+                // Create an object that contains both the CSV content and the phone number details
+                var responseData = new
                 {
-                    Content = new ByteArrayContent(Encoding.ASCII.GetBytes(csvContent))
+                    CsvContent = csvContent,
+                    PhoneNumberDetails = phoneNumberDetails,
+                    DownloadUrl = downloadUrl
                 };
 
-                // Set the content type header to "text/csv"
-                response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv");
+                // Serialize the response object to JSON
+                var jsonResponse = JsonConvert.SerializeObject(responseData);
 
-                // Set the content disposition header to "attachment; filename=phone_details.csv"
-                response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
-                {
-                    FileName = "phone_details.csv"
-                };
+                // Return the phone number details and CSV file
+                return Ok(responseData);
 
-                // Return the response message
-                return response;
+                //return Ok(JsonConvert.SerializeObject(phoneNumberDetails));
 
             }
 
             catch (NumberParseException)
             {
-                var response = new HttpResponseMessage(HttpStatusCode.BadRequest); 
-                response.Content = new StringContent("Invalid phone number.");
-                return response;
+                return BadRequest("Invalid phone number.");
             }
         }
 
-
-        // PUT api/values/5
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/values/5
-        public void Delete(int id)
-        {
-        }
     }
 }

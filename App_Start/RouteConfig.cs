@@ -20,12 +20,6 @@ namespace PhoneValidatorAPI
             );
 
 
-            // Route for downloading CSV file
-            routes.MapRoute(
-                name: "DownloadCsvFile",
-                url: "api/download-csv-file/{phoneNumber}/{countryCode}",
-                defaults: new { controller = "ValuesController", action = "DownloadCsvFile" }
-            );
         }
     }
 }

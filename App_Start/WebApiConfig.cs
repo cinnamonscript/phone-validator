@@ -16,6 +16,12 @@ namespace PhoneValidatorAPI
             config.MapHttpAttributeRoutes();
 
             config.Routes.MapHttpRoute(
+                name: "DownloadCsv",
+                routeTemplate: "api/downloadcsv/{downloadId}",
+                defaults: new { controller = "Values", action = "DownloadCsv" }
+            );
+
+            config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }

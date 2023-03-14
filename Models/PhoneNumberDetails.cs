@@ -11,5 +11,7 @@ namespace PhoneValidatorAPI.Models
         public bool IsPossible { get; set; }
         public string PhoneType { get; set; }
         public string InternationalFormat { get; set; }
+
+
     }
 }
