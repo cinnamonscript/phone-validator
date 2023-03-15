@@ -314,3 +314,5 @@ C:\Users\simmo\Documents\GitHub\phone-validator\Files\PhoneValidatorAPI\PhoneVal
 C:\Users\simmo\Documents\GitHub\phone-validator\Files\PhoneValidatorAPI\PhoneValidatorAPI\bin\Antlr3.Runtime.pdb
 C:\Users\simmo\Documents\GitHub\phone-validator\Files\PhoneValidatorAPI\PhoneValidatorAPI\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
 C:\Users\simmo\Documents\GitHub\phone-validator\Files\PhoneValidatorAPI\PhoneValidatorAPI\obj\Debug\PhoneValidatorAPI.csproj.CopyComplete
+C:\Users\simmo\Documents\GitHub\phone-validator\Files\PhoneValidatorAPI\PhoneValidatorAPI\bin\nunit.framework.dll
+C:\Users\simmo\Documents\GitHub\phone-validator\Files\PhoneValidatorAPI\PhoneValidatorAPI\bin\nunit.framework.xml
