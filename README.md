@@ -15,6 +15,16 @@ The user can submit a phone number for validation. If the phone number is valid,
 # Getting Started
 To get started with the project, clone the repository and follow the instructions below.
 
+# Dependencies
+
+* .NET Framework 4.5 or higher
+* [PhoneNumbers library](https://github.com/google/libphonenumber) for phone number validation and formatting
+* [Newtonsoft.Json library](https://www.newtonsoft.com/json) for JSON serialization and deserialization
+
+To install the PhoneNumbers and Newtonsoft.Json libraries, you can use NuGet Package Manager in Visual Studio or run the following commands in the Package Manager Console:
+`Install-Package PhoneNumbers`
+`Install-Package Newtonsoft.Json`
+
 # Prerequisites
-.NET and ASP.NET environment
-Nuget package manager
+* .NET and ASP.NET environment
+* Nuget package manager
