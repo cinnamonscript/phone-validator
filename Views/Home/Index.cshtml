@@ -1,0 +1,142 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Phone Number Validator</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+
+        $(document).ready(function () {
+            $('#validate-button').click(function (event) {
+                event.preventDefault();
+
+                // Get the phone number and country code from the input fields
+                //var phoneNumber = $('#phone-number-input').val();
+                //var countryCode = $('#country-code-input').val();
+
+                // Get references to the select and input elements
+                const countryCodeSelect = document.getElementById('country-code-input');
+                const phoneNumberInput = document.getElementById('phone-number-input');
+
+                // Get the selected country code
+                const countryCode = countryCodeSelect.value;
+
+                // Get the current phone number value
+                let phoneNumber = phoneNumberInput.value.trim();
+
+                // Format the phone number based on the selected country code
+                if (countryCode === 'AU' && !phoneNumber.startsWith('+61')) {
+                    phoneNumber = '+61' + phoneNumber.replace(/^0/, '');
+                } else if ((countryCode === 'US' || countryCode === 'CA') && !phoneNumber.startsWith('+1')) {
+                    phoneNumber = '+1' + phoneNumber.replace(/\D/g, '');
+                }
+
+                // Update the phone number input value
+                phoneNumberInput.value = phoneNumber;
+
+                // Make a POST request to the validation API
+                $.ajax({
+                    url: '/api/values',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        number: phoneNumber,
+                        countryCode: countryCode,
+                    }),
+                    beforeSend: function () {
+                        // Clear the validation results and CSV download link
+                        $('#is-valid-result').empty();
+                        $('#is-possible-result').empty();
+                        $('#phone-type-result').empty();
+                        $('#international-format-result').empty();
+                        $('#csv-download-link').empty();
+                        $('#validation-error-message').empty();
+                    },
+                    success: function (data) {
+                        console.log(data);
+                        console.log(phoneNumber);
+                        phoneNumberDetails = data.PhoneNumberDetails
+                        // Display the validation and phone number details
+                        $('#is-valid-result').text(phoneNumberDetails.IsValid);
+                        $('#is-possible-result').text(phoneNumberDetails.IsPossible);
+                        $('#phone-type-result').text(phoneNumberDetails.PhoneType);
+                        $('#international-format-result').text(phoneNumberDetails.InternationalFormat);
+
+                        // Add a link to download the CSV file that includes phone number details
+                        var downloadLink = $('<a/>', {
+                            href: data.DownloadUrl,
+                            download: 'phone_details_' + phoneNumber + '.csv',
+                            text: 'Download as CSV'
+                        });
+                        $('#csv-download-link').html(downloadLink);
+                    },
+
+                    error: function (xhr, status, error) {
+                        // Display an error message
+                        $('#validation-error-message').text('Error: ' + xhr.responseText);
+                    }
+                });
+            });
+        });
+
+    </script>
+</head>
+<body>
+
+    <div class="jumbotron">
+        <h1>Phone Number Validator</h1>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Input Phone Number</h2>
+            <form>
+                <div>
+                    <p>Please enter a 10-digit phone number including the area code.</p>
+                    <label for="phone-number-input">Phone Number:</label>
+                    <input type="text" id="phone-number-input" name="phoneNumber">
+                </div>
+                <div>
+                    <label for="country-code-input">Country Code:</label>
+                    <select id="country-code-input" name="countryCode">
+                        <option value="AU">Australia</option>
+                        <option value="US">United States of America</option>
+                        <option value="CA">Canada</option>
+                    </select>
+                </div>
+                <div>
+                    <button class="btn btn-default" id="validate-button" type="submit">Validate</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <h2>Validation Results</h2>
+            <div>
+                <label for="is-valid-result">Is Valid:</label>
+                <span id="is-valid-result"></span>
+            </div>
+
+            <div>
+                <label for="is-possible-result">Is Possible:</label>
+                <span id="is-possible-result"></span>
+            </div>
+
+            <div>
+                <label for="phone-type-result">Phone Type:</label>
+                <span id="phone-type-result"></span>
+            </div>
+
+            <div>
+                <label for="international-format-result">International Format:</label>
+                <span id="international-format-result"></span>
+            </div>
+
+            <div>
+                <button class="btn btn-default" id="csv-download-link">Download as CSV</button>
+            </div>
+            <div id="validation-error-message"></div>
+        </div>
+    </div>
+
+
+</body>
+</html>
