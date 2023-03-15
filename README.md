@@ -12,6 +12,14 @@ The frontend is developed in .NET and ASP.NET. It communicates with the backend 
 
 The user can submit a phone number for validation. If the phone number is valid, the frontend allows the user to download a CSV file with the phone number information displayed on the screen. The CSV file has 4 columns and 2 rows. The first row contains the headers, which are IsValid, IsPossible, PhoneType, and InternationalFormat. The second row contains the phone number details accordingly.
 
+# Detailed Summary
+
+This program is a web application that allows users to input a phone number and country code and then validate the phone number using Google's libphonenumber library. The program uses jQuery to make an AJAX request to a validation API, passing the phone number and country code in the request body. The server-side code is written in C# and uses the libphonenumber library to validate the phone number.
+
+The web page consists of a form that allows users to input a phone number and select a country code. When the "Validate" button is clicked, the JavaScript code in the page extracts the phone number and country code from the form, formats the phone number based on the country code, and then makes an AJAX request to the validation API.
+
+The server-side code receives the request and uses the libphonenumber library to validate the phone number. The validation results are then returned to the client as a JSON object, which is processed by the JavaScript code in the web page. The validation results are displayed on the page, and a link to download a CSV file containing the validation results is also provided.
+
 # Getting Started
 To get started with the project, clone the repository and follow the instructions below.
 
